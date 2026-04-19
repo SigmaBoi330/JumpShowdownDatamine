@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jump Showdown Datamine</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Jump Showdown Datamine</h1>
+        <div class="controls">
+            <input type="text" id="searchInput" placeholder="Search for anything...">
+            <button id="copyButton">Copy All Data</button>
+        </div>
+        <pre id="dataDisplay">Loading data...</pre>
+    </div>
+
+    <script>
+        // --- PASTE YOUR RAW GIST URL HERE ---
+        const GIST_RAW_URL = 'https://gist.githubusercontent.com/SigmaBoi330/4e399ac2bcd1cf41cf2f895788205d06/raw/0b0e03cce72559553709c088ebef7b5f9bf50d1d/Jump%2520Showdown%2520Datamine';
+
+        const dataDisplay = document.getElementById('dataDisplay');
+        const searchInput = document.getElementById('searchInput');
+        const copyButton = document.getElementById('copyButton');
+        let originalData = '';
+
+        // Fetch data from the Gist
+        fetch(GIST_RAW_URL)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                originalData = data;
+                dataDisplay.textContent = originalData;
+            })
+            .catch(error => {
+                dataDisplay.textContent = 'Failed to load data. Is the Gist URL correct?';
+                console.error('Error fetching Gist:', error);
+            });
+
+        // Function to filter data based on search input
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const lines = originalData.split('\n');
+            const filteredLines = lines.filter(line => line.toLowerCase().includes(searchTerm));
+            dataDisplay.textContent = filteredLines.join('\n');
+        });
+
+        // Function to copy the original data to clipboard
+        copyButton.addEventListener('click', () => {
+            navigator.clipboard.writeText(originalData).then(() => {
+                // Provide feedback to the user
+                const originalText = copyButton.textContent;
+                copyButton.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyButton.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        });
+    </script>
+</body>
+</html>
